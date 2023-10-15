@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="270.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="330.0" prefWidth="138.0" />
+      <VBox prefHeight="365.0" prefWidth="137.0">
+         <children>
+            <VBox prefHeight="29.0" prefWidth="183.0">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button mnemonicParsing="false" text="Delete" />
+                        <Button mnemonicParsing="false" text="Add" />
+                        <Button mnemonicParsing="false" text="Sort" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Img" />
+            <ImageView fitHeight="107.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../Documents/Pictures/TaeBoi.PNG" />
+               </image>
+            </ImageView>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name" />
+            <TextField />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Phone No." />
+            <TextField />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Email" />
+            <TextField />
+         </children>
+      </VBox>
+   </children>
+</HBox>
