@@ -51,29 +51,24 @@ class Contact extends HBox {
     private ImageView imageView = new ImageView();
     private FileChooser fileChooser = new FileChooser();
 
-    private void uploadImage(Stage primaryStage) {
+    private boolean editing;
 
+    private void uploadImage(Stage primaryStage) {
         // Select which extensions are allowed
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
-
-
         if (selectedFile != null) {
             Image image = new Image(selectedFile.toURI().toString());
-
             
             // * TODO6: Set the selected image in imageView i.e. display the image.
             // * Hint: To implement this, you can use the setImage() method of ImageView and pass the selected image as an argument.
              
             imageView.setImage(image);
-
             // Resize the window to fit the image
             primaryStage.setWidth(image.getWidth() + 100);
             primaryStage.setHeight(image.getHeight() + 100);
         }
     }
-
-    private boolean editing;
 
     Contact() {
         this.setPrefSize(900, 60); // sets size of tcontact
@@ -89,7 +84,7 @@ class Contact extends HBox {
         this.getChildren().add(index); // add index label to contact
 
         contactName = new TextField(); // create contact name text field
-        contactName.setPrefSize(200, 20); // set size of text field
+        contactName.setPrefSize(150, 40); // set size of text field
         contactName.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;"); // set background color of texfield
         index.setTextAlignment(TextAlignment.LEFT); // set alignment of text field
         contactName.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
@@ -97,7 +92,7 @@ class Contact extends HBox {
         this.getChildren().add(contactName); // add textlabel to contact
 
         email = new TextField(); // create email text field
-        email.setPrefSize(200, 20); // set size of text field
+        email.setPrefSize(150, 40); // set size of text field
         email.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;"); // set background color of texfield
         index.setTextAlignment(TextAlignment.LEFT); // set alignment of text field
         email.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
@@ -105,7 +100,7 @@ class Contact extends HBox {
         this.getChildren().add(email); // add textlabel to contact
         
         phoneNumber = new TextField(); // create phoneNumber text field
-        phoneNumber.setPrefSize(200, 20); // set size of text field
+        phoneNumber.setPrefSize(150, 40); // set size of text field
         phoneNumber.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;"); // set background color of texfield
         index.setTextAlignment(TextAlignment.LEFT); // set alignment of text field
         phoneNumber.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
@@ -118,11 +113,11 @@ class Contact extends HBox {
         editButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;"); // sets style of button
         this.getChildren().add(editButton);
 
-       /*  uploadButton = new Button("Upload Image");
+        uploadButton = new Button("Upload Image");
         uploadButton.setPrefSize(180, 60);
         uploadButton.setPrefHeight(Double.MAX_VALUE);
         uploadButton.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0;"); // sets style of button
-        this.getChildren().add(editButton);*/
+        this.getChildren().add(uploadButton);
 
     }
 
@@ -208,7 +203,7 @@ class ContactList extends VBox {
      */
     public void loadContacts() {
         // hint 1: use try-catch block
-        // hint 2: use BufferedReader and FileReader
+        // hint 2: use BufferedReader and FileRseader
         // hint 3: task.getTaskName().setText() sets the text of the task
 
         try(FileReader fr = new FileReader("tasks.txt");
@@ -244,22 +239,24 @@ class ContactList extends VBox {
      * Save tasks to a file called "tasks.txt"
      */
     public void saveContacts() {
-        // hint 1: use try-catch block
-        // hint 2: use FileWriter
-        // hint 3: this.getChildren() gets the list of tasks
+    
         try{
-            FileWriter contactwrite = new FileWriter("contacts.txt");
+            FileWriter contactwrite = new FileWriter("contacts.csv");
+            
             for(int i = 0; i < this.getChildren().size(); i++){
-                contactwrite.write(((Contact) this.getChildren().get(i)).getContactName().getText() + "\n");
+                contactwrite.write(((Contact) this.getChildren().get(i)).getContactName().getText()+
+                ','+ ((Contact) this.getChildren().get(i)).getEmail().getText().toString()+','+
+                ((Contact) this.getChildren().get(i)).getPhoneNumber().getText().toString() + "\n");
             }
+      
             contactwrite.close();
+        
         }catch(Exception e){
             e.printStackTrace();
+           
         }
-
-//       
+        
     }
-
     // TODO: Complete this method
     /*
      * Sort the tasks lexicographically
@@ -510,4 +507,3 @@ public class Main extends Application {
         launch(args);
     }
 }
-
