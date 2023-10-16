@@ -48,10 +48,10 @@ class Contact extends HBox {
     private Button uploadButton;
 
     // upload Image 
-    //private ImageView imageView = new ImageView();
-    //private FileChooser fileChooser = new FileChooser();
+    private ImageView imageView = new ImageView();
+    private FileChooser fileChooser = new FileChooser();
 
-    /*private void uploadImage(Stage primaryStage) {
+    private void uploadImage(Stage primaryStage) {
 
         // Select which extensions are allowed
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
@@ -72,7 +72,7 @@ class Contact extends HBox {
             primaryStage.setHeight(image.getHeight() + 100);
         }
     }
-*/
+
     private boolean editing;
 
     Contact() {
@@ -268,17 +268,25 @@ class ContactList extends VBox {
         // hint 1: this.getChildren() gets the list of tasks
         // hint 2: Collections.sort() can be used to sort the tasks
         // hint 3: task.getTaskName().setText() sets the text of the task
-        List<Pair<String, Boolean>> listChildren = new ArrayList<Pair<String, Boolean>>();
+        List<Pair<String[], Boolean>> listChildren = new ArrayList<Pair<String[], Boolean>>();
 
         for(int i = 0; i < this.getChildren().size(); i++){
-            listChildren.add(new Pair<>(((Contact) this.getChildren().get(i)).getContactName().getText().toString(),
-                    ((Contact) this.getChildren().get(i)).isMarkedEdit()));
+            String[] arrContacts = {((Contact) this.getChildren().get(i)).getContactName().getText().toString(),
+                            ((Contact) this.getChildren().get(i)).getEmail().getText().toString(),
+                                ((Contact) this.getChildren().get(i)).getPhoneNumber().getText().toString()};
+
+            listChildren.add(new Pair<>(arrContacts, ((Contact) this.getChildren().get(i)).isMarkedEdit()));
         }
 
-        Collections.sort(listChildren, new Comparator<Pair<String, Boolean>>() {
+        Collections.sort(listChildren, new Comparator<Pair<String[], Boolean>>() {
             @Override
-            public int compare(final Pair<String, Boolean> o1, final Pair<String, Boolean> o2){
-                return o1.getKey().compareTo(o2.getKey());
+            public int compare(final Pair<String[], Boolean> o1, final Pair<String[], Boolean> o2){
+                String s = o1.getKey()[0];
+                String s2 = o2.getKey()[0];
+                if(s == ""){
+                    return 1;
+                }
+                return s.compareTo(s2);
             }
         }
         );
@@ -286,9 +294,9 @@ class ContactList extends VBox {
         this.getChildren().clear();
         for(int i = 0; i < listChildren.size(); i++){
             Contact contact = new Contact();
-            contact.getContactName().setText(listChildren.get(i).getKey());
-            contact.getEmail().setText(listChildren.get(i).getKey());
-            contact.getPhoneNumber().setText(listChildren.get(i).getKey());
+            contact.getContactName().setText(listChildren.get(i).getKey()[0]);
+            contact.getEmail().setText(listChildren.get(i).getKey()[1]);
+            contact.getPhoneNumber().setText(listChildren.get(i).getKey()[2]);
             if(listChildren.get(i).getValue()){
                 contact.toggleEdit();
             }
