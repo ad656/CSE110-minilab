@@ -48,27 +48,13 @@ class Contact extends HBox {
     private Button uploadButton;
 
     // upload Image 
-    private ImageView imageView = new ImageView();
-    private FileChooser fileChooser = new FileChooser();
+    
 
     private boolean editing;
+    private String imgpath;
 
-    private void uploadImage(Stage primaryStage) {
-        // Select which extensions are allowed
-        fileChooser.getExtensionFilters().add(new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
-        if (selectedFile != null) {
-            Image image = new Image(selectedFile.toURI().toString());
-            
-            // * TODO6: Set the selected image in imageView i.e. display the image.
-            // * Hint: To implement this, you can use the setImage() method of ImageView and pass the selected image as an argument.
-             
-            imageView.setImage(image);
-            // Resize the window to fit the image
-            primaryStage.setWidth(image.getWidth() + 100);
-            primaryStage.setHeight(image.getHeight() + 100);
-        }
-    }
+
+    
 
     Contact() {
         this.setPrefSize(900, 60); // sets size of tcontact
@@ -151,7 +137,13 @@ class Contact extends HBox {
     public boolean isMarkedEdit() {
         return this.editing;
     }
+    public String getimgpath(){
+        return this.imgpath;
+    }
     
+    public void setimgpath(String s){
+        this.imgpath = s;
+    }
 
     public void toggleEdit() {
         
@@ -168,12 +160,40 @@ class Contact extends HBox {
             this.getChildren().get(i).setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0; -fx-font-weight: bold;");// change color of task back
         }
     } 
-    public void addpic(){
-
+    public void addpic(Stage contactStage){
+        // Select which extensions are allowed
+        ImageView imageView = new ImageView();
+        FileChooser fileChooser = new FileChooser();
+    
+        fileChooser.getExtensionFilters().add(new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+        File selectedFile = fileChooser.showOpenDialog(contactStage);
+        
+        
+        if (selectedFile != null) {
+            Image image = new Image(selectedFile.toURI().toString());
+            imageView.setImage(image);
+            imgpath = selectedFile.toString();
+            
+            
+            // * TODO6: Set the selected image in imageView i.e. display the image.
+            // * Hint: To implement this, you can use the setImage() method of ImageView and pass the selected image as an argument.
+            uploadButton.setGraphic(imageView);
+            //imageView.setImage(image);
+            // new
+            imageView.setFitWidth(180);
+            imageView.setFitHeight(60);
+        
+        }
+        
+    
     }
 }
 
 class ContactList extends VBox {
+    private Stage stage;
+    public Stage getStage(){
+        return stage;
+    }
 
     ContactList() {
         this.setSpacing(5); // sets spacing between tasks
@@ -198,44 +218,6 @@ class ContactList extends VBox {
 
     // TODO: Complete this method
     /*
-     * Load tasks from a file called "tasks.txt"
-     * Add the tasks to the children of tasklist component
-     */
-    public void loadContacts() {
-        // hint 1: use try-catch block
-        // hint 2: use BufferedReader and FileRseader
-        // hint 3: task.getTaskName().setText() sets the text of the task
-
-        try(FileReader fr = new FileReader("tasks.txt");
-                BufferedReader br = new BufferedReader(fr)){
-            String line = null;
-            while((line = br.readLine()) != null) {
-                Contact task = new Contact();
-                task.getContactName().setText(line);
-                this.getChildren().add(task);
-
-                updateTaskIndices();
-                Button editButton = task.getEditButton();
-                    editButton.setOnAction(e1 -> {
-                        // Call toggleDone on click
-                        if (task.isMarkedEdit()==false){
-                            task.toggleEdit();
-                        }
-                        else{
-                            task.unEdit();
-                        }
-                    });
-
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-
-//        System.out.println("loadtasks() not implemented!");
-    }
-
-    // TODO: Complete this method
-    /*
      * Save tasks to a file called "tasks.txt"
      */
     public void saveContacts() {
@@ -246,7 +228,9 @@ class ContactList extends VBox {
             for(int i = 0; i < this.getChildren().size(); i++){
                 contactwrite.write(((Contact) this.getChildren().get(i)).getContactName().getText()+
                 ','+ ((Contact) this.getChildren().get(i)).getEmail().getText().toString()+','+
-                ((Contact) this.getChildren().get(i)).getPhoneNumber().getText().toString() + "\n");
+                ((Contact) this.getChildren().get(i)).getPhoneNumber().getText().toString()+','+ 
+                ((Contact) this.getChildren().get(i)).getimgpath() + "\n");
+
             }
       
             contactwrite.close();
@@ -270,7 +254,8 @@ class ContactList extends VBox {
         for(int i = 0; i < this.getChildren().size(); i++){
             String[] arrContacts = {((Contact) this.getChildren().get(i)).getContactName().getText().toString(),
                             ((Contact) this.getChildren().get(i)).getEmail().getText().toString(),
-                                ((Contact) this.getChildren().get(i)).getPhoneNumber().getText().toString()};
+                                ((Contact) this.getChildren().get(i)).getPhoneNumber().getText().toString(),
+                                    ((Contact) this.getChildren().get(i)).getimgpath().toString() };
 
             listChildren.add(new Pair<>(arrContacts, ((Contact) this.getChildren().get(i)).isMarkedEdit()));
         }
@@ -287,13 +272,31 @@ class ContactList extends VBox {
             }
         }
         );
- 
+
         this.getChildren().clear();
         for(int i = 0; i < listChildren.size(); i++){
             Contact contact = new Contact();
             contact.getContactName().setText(listChildren.get(i).getKey()[0]);
             contact.getEmail().setText(listChildren.get(i).getKey()[1]);
             contact.getPhoneNumber().setText(listChildren.get(i).getKey()[2]);
+
+            if(listChildren.get(i).getKey()[3] == null){
+                contact.setimgpath("");
+            }else{
+            contact.setimgpath(listChildren.get(i).getKey()[3]);
+            }
+            System.out.println(listChildren.get(i).getKey()[3]);
+            File selectedFile = new File(listChildren.get(i).getKey()[3]);
+            if(selectedFile != null){
+                Image image = new Image(selectedFile.toURI().toString());
+                ImageView imageView = new ImageView();
+                imageView.setImage(image);
+                imageView.setFitWidth(180);
+                imageView.setFitHeight(60);
+
+                contact.getUploadButton().setGraphic(imageView);
+            }
+
             if(listChildren.get(i).getValue()){
                 contact.toggleEdit();
             }
@@ -308,6 +311,11 @@ class ContactList extends VBox {
                         contact.unEdit();
                     }
             });
+            Button uploadButton = contact.getUploadButton();
+                uploadButton.setOnAction(e1 -> {
+                    contact.addpic(getStage());
+                });
+
             this.getChildren().add(contact);
             updateTaskIndices();
         }
@@ -322,7 +330,7 @@ class Footer extends HBox {
     // TODO: Add a button called "loadButton" to load tasks from file
     // TODO: Add a button called "saveButton" to save tasks to a file
     // TODO: Add a button called "sortButton" to sort the tasks lexicographically
-    private Button loadButton;
+    //private Button loadButton;
     private Button saveButton;
     private Button sortButton;
 
@@ -339,14 +347,14 @@ class Footer extends HBox {
         clearButton = new Button("Remove Selected"); // text displayed on clear tasks button
         clearButton.setStyle(defaultButtonStyle);
 
-        loadButton = new Button("Load Contacts");
-        loadButton.setStyle(defaultButtonStyle);
+        //loadButton = new Button("Load Contacts");
+        //loadButton.setStyle(defaultButtonStyle);
         saveButton = new Button("Save Contacts");
         saveButton.setStyle(defaultButtonStyle);
         sortButton = new Button("Sort Contacts");
         sortButton.setStyle(defaultButtonStyle);
 
-        this.getChildren().addAll(addButton, clearButton, loadButton, saveButton, sortButton); // adding buttons to footer
+        this.getChildren().addAll(addButton, clearButton, saveButton, sortButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
 
         // TODO: Create loadButton, saveButton and sortButton to the footer
@@ -360,9 +368,9 @@ class Footer extends HBox {
         return clearButton;
     }
 
-    public Button getLoadButton(){
+   /*  public Button getLoadButton(){
         return loadButton;
-    }
+    }*/
 
     public Button getSortButton(){
         return sortButton;
@@ -396,20 +404,26 @@ class AppFrame extends BorderPane{
     private Button addButton;
     private Button clearButton;
 
-    private Button loadButton;
+    //private Button loadButton;
     private Button saveButton;
     private Button sortButton;
+    private Stage stage;
+
+    public Stage getStage(){
+        return stage;
+    }
 
     AppFrame()
     {
         // Initialise the header Object
         header = new Header();
-
         // Create a tasklist Object to hold the tasks
         contactList = new ContactList();
         
         // Initialise the Footer Object
         footer = new Footer();
+
+        
 
         // TODO: Add a Scroller to the Task List
         // hint 1: ScrollPane() is the Pane Layout used to add a scroller - it will take the tasklist as a parameter
@@ -429,7 +443,7 @@ class AppFrame extends BorderPane{
         // Initialise Button Variables through the getters in Footer
         addButton = footer.getAddButton();
         clearButton = footer.getClearButton();
-        loadButton = footer.getLoadButton();
+        //loadButton = footer.getLoadButton();
         saveButton = footer.getSaveButton();
         sortButton = footer.getSortButton();
 
@@ -444,14 +458,18 @@ class AppFrame extends BorderPane{
         addButton.setOnAction(e -> {
             // Create a new task
             Contact contact = new Contact();
+            Stage mainStage = getStage();
             // Add task to contactlist
             contactList.getChildren().add(contact);
             // Add editButtonToggle to the Edit button
             Button editButton = contact.getEditButton();
-           /* Button uploadButton = contact.getUploadButton();
+            Button uploadButton = contact.getUploadButton();
+
+            //Scene scene = new Scene(uploadButton, 180,60);
+            
             uploadButton.setOnAction(e1->{
-                contact.addpic();
-            });*/
+                contact.addpic(stage);
+            });
             editButton.setOnAction(e1 -> {
                 // Call toggleedit on click
                 if (contact.isMarkedEdit()==false){
@@ -469,11 +487,11 @@ class AppFrame extends BorderPane{
         clearButton.setOnAction(e -> {
             contactList.removeSelectedContact();
         });
-
+/*
         loadButton.setOnAction(e -> {
             contactList.loadContacts();
         });
-
+*/
         saveButton.setOnAction(e -> {
             contactList.saveContacts();
         });
@@ -485,6 +503,13 @@ class AppFrame extends BorderPane{
 }
 
 public class Main extends Application {
+
+    /* new code */
+    private Stage stage;
+
+    public Stage getStage(){
+        return stage;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -498,6 +523,10 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 900, 1000));
         // Make window non-resizable
         primaryStage.setResizable(false);
+
+        /* new code */
+        this.stage = primaryStage;
+
         // Show the app
         primaryStage.show();
 
